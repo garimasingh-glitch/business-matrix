@@ -699,13 +699,34 @@
 
       // -------------------- Boot --------------------
       const main = () => {
-        allOrders = generateMockData().map(o => ({ ...o, orderDate: new Date(o.orderDate), acquisitionDate: new Date(o.acquisitionDate) }));
-        initCharts();
-        setupControls();
-        populatePeriodSelector();
-        renderAllCharts(allOrders);
-      };
-      main();
+  const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSk8lAdIuxcs7Q5Wjh8Al997sQKgcN97-xAm276iJB7O2b47GGG3qrLNBWD6HR4dA/pub?gid=304614171&single=true&output=csv";
+
+  fetch(csvUrl)
+    .then(response => response.text())
+    .then(csvText => {
+      const parsed = parseCSV(csvText);
+      allOrders = parsed;
+      initCharts();
+      setupControls();
+      populatePeriodSelector();
+      renderAllCharts(allOrders);
+    })
+    .catch(err => {
+      console.error("Error fetching Google Sheet CSV:", err);
+      // Fallback: still allow mock data if Google Sheets is unavailable
+      allOrders = generateMockData().map(o => ({
+        ...o,
+        orderDate: new Date(o.orderDate),
+        acquisitionDate: new Date(o.acquisitionDate)
+      }));
+      initCharts();
+      setupControls();
+      populatePeriodSelector();
+      renderAllCharts(allOrders);
+    });
+};
+
+main();
     });
   </script>
 </body>
